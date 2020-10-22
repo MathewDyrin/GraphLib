@@ -117,6 +117,37 @@ std::pair<char, int> FindMinCostNode(std::map<char, int> nodeTable)
     return std::make_pair(minNodeName, minNodeCost);
 }
 
+void FindShortestPath(Graph &graph, std::map<char, int> &toProcessed, std::map<char, int> &edgesCosts,Node *endNode)
+{
+
+    while (toProcessed.size() != 0)
+    {
+        std::pair<char, int> minVertex = FindMinCostNode(toProcessed);
+
+        char minVertexName = minVertex.first;
+        int minVertexCost = minVertex.second;
+
+        std::map<char, int> neighbours = graph.GetNode(minVertexName).GetNodeNeighbours();
+
+        if (neighbours.size() != 0)
+        {
+            for (const auto neighbour : neighbours)
+            {
+                int newCost = minVertexCost + neighbour.second;
+                if (newCost < edgesCosts[neighbour.first])
+                {
+                    edgesCosts[neighbour.first] = newCost;
+                    toProcessed[neighbour.first] = newCost;
+                }
+            }
+        }
+        toProcessed.erase(minVertexName);
+    }
+
+    std::cout << "The minimum cost to Node " << (*endNode).GetNodeName() << ": " << edgesCosts[(*endNode).GetNodeName()] << std::endl;
+}
+
+
 int main()
 {
     Node s('S');
@@ -170,30 +201,6 @@ int main()
         }
     }
 
+    FindShortestPath(graph, toProcessed, edgesCosts, endNode); 
 
-    while (toProcessed.size() != 0)
-    {
-        std::pair<char, int> minVertex = FindMinCostNode(toProcessed);
-
-        char minVertexName = minVertex.first;
-        int minVertexCost = minVertex.second;
-
-        std::map<char, int> neighbours = graph.GetNode(minVertexName).GetNodeNeighbours();
-
-        if (neighbours.size() != 0)
-        {
-            for (const auto neighbour : neighbours)
-            {
-                int newCost = minVertexCost + neighbour.second;
-                if (newCost < edgesCosts[neighbour.first])
-                {
-                    edgesCosts[neighbour.first] = newCost;
-                    toProcessed[neighbour.first] = newCost;
-                }
-            }
-        }
-        toProcessed.erase(minVertexName);
-    }
-
-    std::cout << "The minimum cost to Node " << (*endNode).GetNodeName() << ": " << edgesCosts[(*endNode).GetNodeName()] << std::endl;
 }
